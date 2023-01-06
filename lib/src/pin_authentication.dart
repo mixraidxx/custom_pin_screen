@@ -120,6 +120,7 @@ class _PinAuthenticationState extends State<PinAuthentication> {
                   });
                 }
                 widget.onChanged!(pin);
+                print("Tamaño de pin $pin");
                 if (pin.length >= widget.maxLength &&
                     widget.onCompleted != null) {
                   if (widget.confirm!) {
@@ -197,7 +198,30 @@ class _PinAuthenticationState extends State<PinAuthentication> {
                 });
               }
               widget.onChanged!(pin);
-              if (pin.length >= 4 && widget.onCompleted != null) {
+              if (pin.length >= widget.maxLength &&
+                  widget.onCompleted != null) {
+                if (widget.confirm!) {
+                  if (confirmPin == "") {
+                    confirmPin = pin;
+                    setState(() {
+                      pin = "";
+                      widget.action = "Confirmar PIN";
+                    });
+                  } else {
+                    if (confirmPin == pin) {
+                      widget.onConfirm!(pin);
+                    } else {
+                      if (currentAttemp < widget.maxAttemp) {
+                        currentAttemp++;
+                        setState(() {
+                          pin = "";
+                        });
+                      } else {
+                        widget.onConfirm!("");
+                      }
+                    }
+                  }
+                }
                 await widget.onCompleted!(pin);
               }
             },
